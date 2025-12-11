@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { CommandCenter } from "@/components/command-center";
 import { useAuthUser } from "@/hooks/use-auth-user";
 
-export default function Home() {
+export default function CommandCenterPage() {
     const router = useRouter();
     const { user, loading } = useAuthUser();
 
