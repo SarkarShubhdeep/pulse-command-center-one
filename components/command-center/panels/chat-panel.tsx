@@ -93,7 +93,7 @@ export function ChatPanel({
                 </div>
             </CardHeader>
 
-            <ScrollArea className="flex-1">
+            <ScrollArea className="flex-1 overflow-y-auto">
                 <div className="p-3 space-y-3">
                     {loading ? (
                         <div className="flex items-center justify-center h-full">
@@ -125,7 +125,9 @@ export function ChatPanel({
                                     >
                                         <div
                                             className={`text-xs mb-1 ${
-                                                isMe ? "text-right" : "text-left"
+                                                isMe
+                                                    ? "text-right"
+                                                    : "text-left"
                                             } text-muted-foreground`}
                                         >
                                             {isMe ? "You" : msg.user_name}
@@ -141,7 +143,9 @@ export function ChatPanel({
                                         </div>
                                         <div
                                             className={`text-[10px] mt-1 ${
-                                                isMe ? "text-right" : "text-left"
+                                                isMe
+                                                    ? "text-right"
+                                                    : "text-left"
                                             } text-muted-foreground`}
                                         >
                                             {formatTime(msg.created_at)}
