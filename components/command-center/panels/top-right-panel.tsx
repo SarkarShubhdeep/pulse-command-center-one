@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
     Collapsible,
     CollapsibleTrigger,
@@ -13,18 +14,28 @@ import {
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { LogOut, Clock, Settings2, Moon, Sun } from "lucide-react";
+import {
+    LogOut,
+    Clock,
+    Settings2,
+    Moon,
+    Sun,
+    MessageCircle,
+} from "lucide-react";
 import { AccountSettingsDialog } from "./account-settings-dialog";
 import { useAuthUser } from "@/hooks/use-auth-user";
 import { useUserOnlineStatus } from "@/hooks/use-user-online-status";
 import { useUserProfile } from "@/hooks/use-user-profile";
+import { useChat } from "@/hooks/use-chat";
 import { UsersList } from "./users-list";
+import { ChatPanel } from "./chat-panel";
 import { createClient } from "@/lib/supabase/client";
 
 export function TopRightPanel() {
     const [isOpen, setIsOpen] = useState(false);
     const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
     const [isSigningOut, setIsSigningOut] = useState(false);
+    const [isChatOpen, setIsChatOpen] = useState(false);
     const { user } = useAuthUser();
     const router = useRouter();
     const { theme, setTheme } = useTheme();
@@ -33,6 +44,7 @@ export function TopRightPanel() {
     const userId = user?.id || "";
 
     const { profile } = useUserProfile(userId);
+    const { unreadCount, hasMentions } = useChat(userId);
 
     useUserOnlineStatus(userId);
     const displayName =
@@ -139,7 +151,7 @@ export function TopRightPanel() {
                         </CollapsibleContent>
                     </Collapsible>
                 </CardHeader>
-                <CardContent className="px-2 pb-4 pt-4 border-t border-forground-muted">
+                <CardContent className="px-2 pb-4 pt-3 border-t border-forground-muted">
                     <UsersList currentUserId={userId} />
                 </CardContent>
             </Card>
@@ -151,6 +163,46 @@ export function TopRightPanel() {
                 userEmail={userEmail}
                 userId={userId}
             />
+
+            {!isChatOpen && (
+                <div className="absolute right-full mr-4 top-0 flex items-center gap-2">
+                    {hasMentions && (
+                        <Badge
+                            variant="destructive"
+                            className="h-5 w-5 flex items-center justify-center p-0 text-[10px]"
+                        >
+                            @
+                        </Badge>
+                    )}
+                    {unreadCount > 0 && !hasMentions && (
+                        <Badge
+                            variant="default"
+                            className="h-5 w-5 flex items-center justify-center p-0 text-[10px]"
+                        >
+                            {unreadCount > 9 ? "9+" : unreadCount}
+                        </Badge>
+                    )}
+                    <Button
+                        variant="secondary"
+                        size="sm"
+                        className="rounded-full h-9 w-9 p-0"
+                        onClick={() => setIsChatOpen(true)}
+                    >
+                        <MessageCircle className="h-4 w-4" />
+                    </Button>
+                </div>
+            )}
+
+            {isChatOpen && (
+                <div className="absolute right-full mr-4 top-0">
+                    <ChatPanel
+                        isOpen={isChatOpen}
+                        onClose={() => setIsChatOpen(false)}
+                        userId={userId}
+                        userName={displayName}
+                    />
+                </div>
+            )}
         </>
     );
 }
