@@ -48,6 +48,7 @@ export function useAuthUser(): AuthUser {
             data: { subscription },
         } = supabase.auth.onAuthStateChange((_event, session) => {
             setUser(session?.user ?? null);
+            setLoading(false);
         });
 
         return () => {

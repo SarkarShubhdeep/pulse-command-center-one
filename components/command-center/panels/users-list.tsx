@@ -37,9 +37,9 @@ export function UsersList({ currentUserId }: UsersListProps) {
     };
 
     return (
-        <div className="space-y-3">
+        <div className="space-y-4">
             {online.length > 0 && (
-                <div className="space-y-2">
+                <div className="space-y-2 px-1 pt-2">
                     <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-2">
                         Online ({online.length})
                     </div>
@@ -77,7 +77,7 @@ export function UsersList({ currentUserId }: UsersListProps) {
             )}
 
             {offline.length > 0 && (
-                <div className="space-y-2">
+                <div className="space-y-2 border-t pt-4 px-1">
                     <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-2">
                         Offline ({offline.length})
                     </div>

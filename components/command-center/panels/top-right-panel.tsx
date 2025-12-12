@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
     Collapsible,
     CollapsibleTrigger,
@@ -20,22 +19,20 @@ import {
     Settings2,
     Moon,
     Sun,
-    MessageCircle,
+    ArrowRightLeft,
+    Loader2,
 } from "lucide-react";
 import { AccountSettingsDialog } from "./account-settings-dialog";
 import { useAuthUser } from "@/hooks/use-auth-user";
 import { useUserOnlineStatus } from "@/hooks/use-user-online-status";
 import { useUserProfile } from "@/hooks/use-user-profile";
-import { useChat } from "@/hooks/use-chat";
-import { UsersList } from "./users-list";
-import { ChatPanel } from "./chat-panel";
+import { useNurseShift } from "@/hooks/use-nurse-shift";
 import { createClient } from "@/lib/supabase/client";
 
 export function TopRightPanel() {
     const [isOpen, setIsOpen] = useState(false);
     const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
     const [isSigningOut, setIsSigningOut] = useState(false);
-    const [isChatOpen, setIsChatOpen] = useState(false);
     const { user } = useAuthUser();
     const router = useRouter();
     const { theme, setTheme } = useTheme();
@@ -44,7 +41,7 @@ export function TopRightPanel() {
     const userId = user?.id || "";
 
     const { profile } = useUserProfile(userId);
-    const { unreadCount, hasMentions } = useChat(userId);
+    const { shift, loading: shiftLoading } = useNurseShift(userId);
 
     useUserOnlineStatus(userId);
     const displayName =
@@ -59,6 +56,14 @@ export function TopRightPanel() {
             .map((n) => n[0])
             .join("")
             .toUpperCase();
+    };
+
+    const formatTime = (timeString: string) => {
+        const [hours, minutes] = timeString.split(":");
+        const hour = parseInt(hours, 10);
+        const ampm = hour >= 12 ? "PM" : "AM";
+        const hour12 = hour % 12 || 12;
+        return `${hour12}:${minutes} ${ampm}`;
     };
 
     const handleSignOut = async () => {
@@ -141,6 +146,15 @@ export function TopRightPanel() {
                             <Button
                                 variant="secondary"
                                 size="sm"
+                                className="w-full justify-start gap-2"
+                                disabled
+                            >
+                                <ArrowRightLeft className="h-4 w-4" />
+                                Switch User
+                            </Button>
+                            <Button
+                                variant="secondary"
+                                size="sm"
                                 className="w-full justify-start gap-2 bg-destructive/20"
                                 onClick={handleSignOut}
                                 disabled={isSigningOut}
@@ -151,8 +165,59 @@ export function TopRightPanel() {
                         </CollapsibleContent>
                     </Collapsible>
                 </CardHeader>
-                <CardContent className="px-2 pb-4 pt-3 border-t border-forground-muted">
-                    <UsersList currentUserId={userId} />
+                <CardContent className="px-4 pb-4 pt-3 border-t border-forground-muted">
+                    {shiftLoading ? (
+                        <div className="flex items-center justify-center h-32">
+                            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                        </div>
+                    ) : !shift ? (
+                        <div className="flex items-center justify-center h-32 text-sm text-muted-foreground">
+                            No shift assigned
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {/* Role */}
+                            <div className="text-sm">
+                                <span className="text-muted-foreground">
+                                    Role:{" "}
+                                </span>
+                                <span className="font-medium">
+                                    {shift.role}
+                                </span>
+                            </div>
+
+                            {/* Shift Time */}
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <Clock className="h-4 w-4" />
+                                <span>
+                                    Shift: {formatTime(shift.shift_start)} -{" "}
+                                    {formatTime(shift.shift_end)}
+                                </span>
+                            </div>
+
+                            {/* General Duties */}
+                            {shift.duties.length > 0 && (
+                                <div className="space-y-2">
+                                    <h4 className="text-sm font-medium text-muted-foreground">
+                                        General Duties
+                                    </h4>
+                                    <ul className="space-y-1.5">
+                                        {shift.duties.map((duty) => (
+                                            <li
+                                                key={duty.id}
+                                                className="flex items-start gap-2 text-sm"
+                                            >
+                                                <span className="text-muted-foreground">
+                                                    •
+                                                </span>
+                                                <span>{duty.duty}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </CardContent>
             </Card>
 
@@ -163,46 +228,6 @@ export function TopRightPanel() {
                 userEmail={userEmail}
                 userId={userId}
             />
-
-            {!isChatOpen && (
-                <div className="absolute right-full mr-4 top-0 flex items-center gap-2">
-                    {hasMentions && (
-                        <Badge
-                            variant="destructive"
-                            className="h-5 w-5 flex items-center justify-center p-0 text-[10px]"
-                        >
-                            @
-                        </Badge>
-                    )}
-                    {unreadCount > 0 && !hasMentions && (
-                        <Badge
-                            variant="default"
-                            className="h-5 w-5 flex items-center justify-center p-0 text-[10px]"
-                        >
-                            {unreadCount > 9 ? "9+" : unreadCount}
-                        </Badge>
-                    )}
-                    <Button
-                        variant="secondary"
-                        size="sm"
-                        className="rounded-full h-9 w-9 p-0"
-                        onClick={() => setIsChatOpen(true)}
-                    >
-                        <MessageCircle className="h-4 w-4" />
-                    </Button>
-                </div>
-            )}
-
-            {isChatOpen && (
-                <div className="absolute right-full mr-4 top-0">
-                    <ChatPanel
-                        isOpen={isChatOpen}
-                        onClose={() => setIsChatOpen(false)}
-                        userId={userId}
-                        userName={displayName}
-                    />
-                </div>
-            )}
         </>
     );
 }

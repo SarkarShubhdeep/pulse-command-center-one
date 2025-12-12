@@ -46,6 +46,7 @@ export function LoginForm({
                     .eq("id", data.user.id);
             }
 
+            router.refresh();
             router.push("/command-center");
         } catch (error: unknown) {
             setError(
