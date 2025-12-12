@@ -18,7 +18,9 @@ interface UseUserProfileReturn {
     refetch: () => Promise<void>;
 }
 
-export function useUserProfile(userId: string): UseUserProfileReturn {
+export function useUserProfile(
+    userId: string | undefined
+): UseUserProfileReturn {
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     Dialog,
     DialogContent,
@@ -31,6 +31,12 @@ export function AccountSettingsDialog({
 }: AccountSettingsDialogProps) {
     const [name, setName] = useState(userName || "");
     const [isSaving, setIsSaving] = useState(false);
+
+    useEffect(() => {
+        if (open && userName) {
+            setName(userName);
+        }
+    }, [open, userName]);
 
     const handleSave = async () => {
         if (!name.trim() || !userId) return;

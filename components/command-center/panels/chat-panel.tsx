@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { X, Send, Loader2 } from "lucide-react";
+import { X, Send, Loader2, MessageCircle } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChat } from "@/hooks/use-chat";
 
@@ -79,7 +79,8 @@ export function ChatPanel({
         <Card className="w-80 h-[500px] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex flex-col">
             <CardHeader className="py-3 px-4 border-b flex-shrink-0">
                 <div className="flex items-center justify-between">
-                    <CardTitle className="text-sm font-medium">
+                    <CardTitle className="text-sm font-medium flex items-center gap-2 uppercase text-muted-foreground">
+                        <MessageCircle className="h-4 w-4" />
                         Team Chat
                     </CardTitle>
                     <Button
@@ -164,8 +165,8 @@ export function ChatPanel({
                 </div>
             </ScrollArea>
 
-            <div className="p-3 border-t flex-shrink-0">
-                <div className="relative">
+            <div className="p-3 border-t flex-shrink-0 flex gap-1">
+                <div className="relative w-full">
                     <Input
                         ref={inputRef}
                         placeholder="Type a message..."
@@ -176,13 +177,13 @@ export function ChatPanel({
                         className="flex-1 h-9 text-sm shadow-none"
                     />
                 </div>
-                <div className="flex gap-2 mt-2 justify-end">
+                <div className="flex gap-2 h-full justify-end">
                     <Button
-                        size="sm"
+                        size="icon"
                         onClick={handleSend}
                         disabled={!inputMessage.trim() || sending}
+                        className="bg-blue-500 shadow-none hover:bg-blue-600 text-white"
                     >
-                        Send
                         {sending ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
