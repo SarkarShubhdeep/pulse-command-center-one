@@ -11,14 +11,14 @@ import {
 import { usePanelsToggle } from "@/hooks/use-panels-toggle";
 
 export function CommandCenter() {
-    const { panelsVisible } = usePanelsToggle();
+    const { panelsVisible, controlsVisible } = usePanelsToggle();
 
     return (
         <div className="relative w-screen h-screen overflow-hidden bg-background">
             {/* React Flow Canvas - Base Layer */}
             <div className="absolute inset-0 z-0">
                 <ReactFlowProvider>
-                    <Canvas />
+                    <Canvas controlsVisible={controlsVisible} />
                 </ReactFlowProvider>
             </div>
 

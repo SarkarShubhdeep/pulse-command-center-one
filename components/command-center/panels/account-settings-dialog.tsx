@@ -346,7 +346,7 @@ export function AccountSettingsDialog({
 
                         {!isVerified ? (
                             /* Master Password Verification */
-                            <div className="space-y-3 bg-muted/50 rounded-lg">
+                            <div className="space-y-3 ">
                                 <div className="grid gap-3">
                                     <div className="grid gap-2">
                                         <Label htmlFor="masterPassword">
@@ -416,7 +416,7 @@ export function AccountSettingsDialog({
                             </div>
                         ) : (
                             /* Verified - Show Security Options */
-                            <div className="space-y-6">
+                            <div className="space-y-2">
                                 {/* Change Password Section */}
                                 <div className="space-y-3 p-4 bg-muted/50 rounded-md">
                                     <div className="flex items-center gap-2 text-muted-foreground">
