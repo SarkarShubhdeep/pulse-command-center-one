@@ -79,7 +79,7 @@ export function TopRightPanel() {
             }
 
             await supabase.auth.signOut();
-            router.push("/auth/login");
+            router.push("/");
         } catch (error) {
             console.error("Error signing out:", error);
             setIsSigningOut(false);

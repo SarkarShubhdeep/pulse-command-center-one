@@ -1,19 +1,62 @@
 "use client";
 
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { CommandCenter } from "@/components/command-center";
 import { useAuthUser } from "@/hooks/use-auth-user";
+import Link from "next/link";
+import Image from "next/image";
+import { Input } from "@/components/ui/input";
+import { Search, ArrowRight } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+import { StaffCard } from "@/components/staff-card";
+
+const activeStaff = [
+    { name: "Mark Hoffner", role: "ICU/Trauma Nurse" },
+    { name: "Cindy Maxwell", role: "Surgical Nurse" },
+    { name: "James Parker", role: "Pediatric Nurse" },
+    { name: "Laura Bennett", role: "Emergency Room Nurse" },
+    { name: "Sophia Kim", role: "Critical Care Nurse" },
+    { name: "David Smith", role: "Medical-Surgical Nurse" },
+    { name: "Emma Johnson", role: "Oncology Nurse" },
+    { name: "Olivia Garcia", role: "Home Health Nurse" },
+    { name: "Aiden Thompson", role: "Geriatric Nurse" },
+];
 
 export default function Home() {
     const router = useRouter();
     const { user, loading } = useAuthUser();
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [isLoggingIn, setIsLoggingIn] = useState(false);
+    const [error, setError] = useState("");
 
     useEffect(() => {
-        if (!loading && !user) {
-            router.push("/auth/login");
+        if (!loading && user) {
+            router.push("/command-center");
         }
     }, [user, loading, router]);
+
+    const handleLogin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsLoggingIn(true);
+        setError("");
+
+        const supabase = createClient();
+        const { error } = await supabase.auth.signInWithPassword({
+            email: username,
+            password: password,
+        });
+
+        if (error) {
+            setError(error.message);
+            setIsLoggingIn(false);
+        } else {
+            router.push("/command-center");
+            setPassword("");
+            setUsername("");
+            setIsLoggingIn(false);
+        }
+    };
 
     if (loading) {
         return (
@@ -26,9 +69,128 @@ export default function Home() {
         );
     }
 
-    if (!user) {
+    if (user) {
         return null;
     }
 
-    return <CommandCenter />;
+    return (
+        <div className="min-h-screen flex p-8">
+            {/* Left Panel - White Background */}
+            <div className="flex-1 bg-white p-12 flex justify-center ">
+                <div className="w-2/3 flex flex-col justify-center h-full ">
+                    {/* Logo Section */}
+                    <div className="flex items-center gap-3 mb-16">
+                        <Image
+                            src="/assets/synapse-logo.svg"
+                            alt="Synapse Logo"
+                            width={48}
+                            height={48}
+                        />
+                        <div>
+                            <Image
+                                src="/assets/synapse-logo-type.svg"
+                                alt="Synapse"
+                                width={140}
+                                height={24}
+                            />
+                            <p className="text-xs text-gray-400 mt-0.5">
+                                alpha0.2
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Active Staff Section */}
+                    <div className="w-full">
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-xl font-semibold text-gray-900 ">
+                                ACTIVE STAFF
+                            </h2>
+                        </div>
+
+                        {/* Staff Grid */}
+                        <div className="grid grid-cols-4 gap-8 mt-8">
+                            {activeStaff.map((staff, index) => (
+                                <StaffCard
+                                    key={index}
+                                    name={staff.name}
+                                    role={staff.role}
+                                    onQuickLogin={(pin) => {
+                                        console.log(
+                                            `Quick login for ${staff.name} with PIN: ${pin}`
+                                        );
+                                    }}
+                                />
+                            ))}
+                        </div>
+
+                        <div className="flex items-center gap-2 text-sm text-gray-500 mt-8">
+                            <span>Can&apos;t see your account?</span>
+                            <button className="text-blue-600 hover:text-blue-700 flex items-center gap-1">
+                                <Search className="w-3 h-3" />
+                                Search with cmd + k
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Right Panel - Dark Background */}
+            <div className="w-1/3 bg-zinc-900 flex flex-col justify-center rounded-2xl">
+                <div className="w-[500px] mx-auto mb-4 flex items-center justify-center flex-col">
+                    <h2 className="text-xl font-medium text-white mb-8 w-full text-left">
+                        LOG INTO YOUR ACCOUNT
+                    </h2>
+
+                    <form onSubmit={handleLogin} className="space-y-4 w-full">
+                        <Input
+                            type="text"
+                            placeholder="Username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            className="bg-zinc-800 border-none text-white placeholder:text-zinc-500 h-12"
+                        />
+                        <Input
+                            type="password"
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="bg-zinc-800 border-none text-white placeholder:text-zinc-500 h-12"
+                        />
+
+                        {error && (
+                            <p className="text-red-400 text-sm">{error}</p>
+                        )}
+
+                        <div className="flex items-center justify-between pt-4">
+                            <div className="flex flex-col gap-1">
+                                <Link
+                                    href="/auth/forgot-password"
+                                    className="text-sm text-muted-foreground group"
+                                >
+                                    Forgot password?{" "}
+                                    <span className="text-blue-400 group-hover:text-blue-300">
+                                        Contact Admin
+                                    </span>
+                                </Link>
+                                <Link
+                                    href="#"
+                                    className="text-sm text-destructive hover:text-red-300"
+                                >
+                                    Contact Emergency
+                                </Link>
+                            </div>
+                            <button
+                                type="submit"
+                                disabled={isLoggingIn || !username || !password}
+                                className="flex items-center gap-2 text-white font-medium hover:text-gray-300 disabled:opacity-50"
+                            >
+                                {isLoggingIn ? "SIGNING IN..." : "SIGN IN"}
+                                <ArrowRight className="w-4 h-4" />
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    );
 }
