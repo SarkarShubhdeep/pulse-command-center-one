@@ -102,11 +102,11 @@ export function TopRightPanel() {
                                 </Avatar>
                             </CardTitle>
                         </CollapsibleTrigger>
-                        <CollapsibleContent className="mt-2 space-y-3">
+                        <CollapsibleContent className="mt-2 space-y-2">
                             <Button
                                 variant="secondary"
                                 size="sm"
-                                className="w-full justify-start gap-2"
+                                className="w-full justify-start gap-2 shadow-none"
                                 onClick={() => setSettingsDialogOpen(true)}
                             >
                                 <Settings2 className="h-4 w-4" />
@@ -137,7 +137,7 @@ export function TopRightPanel() {
                             <Button
                                 variant="secondary"
                                 size="sm"
-                                className="w-full justify-start gap-2"
+                                className="w-full justify-start gap-2 shadow-none"
                                 disabled
                             >
                                 <Clock className="h-4 w-4" />
@@ -146,7 +146,7 @@ export function TopRightPanel() {
                             <Button
                                 variant="secondary"
                                 size="sm"
-                                className="w-full justify-start gap-2"
+                                className="w-full justify-start gap-2 shadow-none"
                                 disabled
                             >
                                 <ArrowRightLeft className="h-4 w-4" />
@@ -155,7 +155,7 @@ export function TopRightPanel() {
                             <Button
                                 variant="secondary"
                                 size="sm"
-                                className="w-full justify-start gap-2 bg-destructive/20"
+                                className="w-full justify-start gap-2 bg-destructive/20 shadow-none"
                                 onClick={handleSignOut}
                                 disabled={isSigningOut}
                             >
