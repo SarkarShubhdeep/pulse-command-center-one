@@ -49,7 +49,7 @@ export function TopRightPanel() {
     const [expandedUserId, setExpandedUserId] = useState<string | null>(null);
     const [switchPin, setSwitchPin] = useState("");
     const [switchError, setSwitchError] = useState("");
-    const [dutiesOpen, setDutiesOpen] = useState(true);
+    const [dutiesOpen, setDutiesOpen] = useState(false);
     const { user } = useAuthUser();
     const router = useRouter();
     const { theme, setTheme } = useTheme();
@@ -459,12 +459,19 @@ export function TopRightPanel() {
                             </div>
 
                             {/* Shift Time */}
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <Clock className="h-4 w-4" />
-                                <span>
-                                    Shift: {formatTime(shift.shift_start)} -{" "}
-                                    {formatTime(shift.shift_end)}
-                                </span>
+                            <div className="flex items-center justify-between gap-2 text-sm text-muted-foreground">
+                                <div className="flex items-center gap-1">
+                                    <Clock className="h-4 w-4" />
+                                    <span>
+                                        Shift: {formatTime(shift.shift_start)} -{" "}
+                                        {formatTime(shift.shift_end)}
+                                    </span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    <span className="text-muted-foreground">
+                                        32%
+                                    </span>
+                                </div>
                             </div>
 
                             {/* General Duties */}
