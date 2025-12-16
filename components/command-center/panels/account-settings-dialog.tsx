@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { createClient } from "@/lib/supabase/client";
 import { Eye, EyeOff, KeyRound, Lock, ShieldCheck } from "lucide-react";
 
@@ -282,181 +283,114 @@ export function AccountSettingsDialog({
 
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogContent className="sm:max-w-[500px] max-h-[85vh] overflow-y-auto">
-                <DialogHeader>
+            <DialogContent className="sm:max-w-[500px] max-h-[85vh] overflow-hidden p-0">
+                <DialogHeader className="px-6 pt-6">
                     <DialogTitle>Account Settings</DialogTitle>
                     <DialogDescription>
                         Manage your account information and security settings
                     </DialogDescription>
                 </DialogHeader>
 
-                <div className="space-y-6 py-4">
-                    {/* Profile Section */}
-                    <div className="space-y-4">
-                        <h3 className="text-sm font-medium flex items-center gap-2 uppercase text-muted-foreground">
-                            Profile Information
-                        </h3>
-                        <div className="grid gap-3">
-                            <div className="grid gap-2">
-                                <Label htmlFor="name">Name</Label>
-                                <div className="flex gap-2">
-                                    <Input
-                                        id="name"
-                                        value={name}
-                                        onChange={(e) =>
-                                            setName(e.target.value)
-                                        }
-                                        placeholder="Enter your name"
-                                        className="flex-1 shadow-none"
-                                    />
-                                    <Button
-                                        onClick={handleSave}
-                                        disabled={
-                                            isSaving ||
-                                            !name.trim() ||
-                                            name === userName
-                                        }
-                                        // size="sm"
-                                    >
-                                        {isSaving ? "Saving..." : "Update"}
-                                    </Button>
+                <ScrollArea className="max-h-[calc(85vh-100px)] px-6 pb-6">
+                    <div className="space-y-6 py-4">
+                        {/* Profile Section */}
+                        <div className="space-y-4">
+                            <h3 className="text-sm font-medium flex items-center gap-2 uppercase text-muted-foreground">
+                                Profile Information
+                            </h3>
+                            <div className="grid gap-3">
+                                <div className="grid gap-2">
+                                    <Label htmlFor="name">Name</Label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            id="name"
+                                            value={name}
+                                            onChange={(e) =>
+                                                setName(e.target.value)
+                                            }
+                                            placeholder="Enter your name"
+                                            className="flex-1 shadow-none"
+                                        />
+                                        <Button
+                                            onClick={handleSave}
+                                            disabled={
+                                                isSaving ||
+                                                !name.trim() ||
+                                                name === userName
+                                            }
+                                            // size="sm"
+                                        >
+                                            {isSaving ? "Saving..." : "Update"}
+                                        </Button>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="email">Email</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    value={userEmail}
-                                    disabled
-                                    placeholder="Your email"
-                                />
+                                <div className="grid gap-2">
+                                    <Label htmlFor="email">Email</Label>
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        value={userEmail}
+                                        disabled
+                                        placeholder="Your email"
+                                    />
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <hr className="border-border" />
+                        <hr className="border-border" />
 
-                    {/* Security Section */}
-                    <div className="space-y-4">
-                        <h3 className="text-sm font-medium flex items-center gap-2 uppercase text-muted-foreground">
-                            <ShieldCheck className="h-4 w-4" />
-                            Security
-                        </h3>
+                        {/* Security Section */}
+                        <div className="space-y-4">
+                            <h3 className="text-sm font-medium flex items-center gap-2 uppercase text-muted-foreground">
+                                <ShieldCheck className="h-4 w-4" />
+                                Security
+                            </h3>
 
-                        {!isVerified ? (
-                            /* Master Password Verification */
-                            <div className="space-y-3 ">
-                                <div className="grid gap-3">
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="masterPassword">
-                                            Current Password
-                                        </Label>
-                                        <p className="text-sm text-muted-foreground">
-                                            Enter your current password to
-                                            change it and view quick switch
-                                            settings
-                                        </p>
-                                        <div className="relative">
-                                            <Input
-                                                id="masterPassword"
-                                                type={
-                                                    showMasterPassword
-                                                        ? "text"
-                                                        : "password"
-                                                }
-                                                value={masterPassword}
-                                                onChange={(e) =>
-                                                    setMasterPassword(
-                                                        e.target.value
-                                                    )
-                                                }
-                                                placeholder="Enter your password"
-                                                className="pr-10 shadow-none"
-                                                onKeyDown={(e) => {
-                                                    if (e.key === "Enter") {
-                                                        handleVerifyPassword();
-                                                    }
-                                                }}
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    setShowMasterPassword(
-                                                        !showMasterPassword
-                                                    )
-                                                }
-                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                                            >
-                                                {showMasterPassword ? (
-                                                    <EyeOff className="h-4 w-4" />
-                                                ) : (
-                                                    <Eye className="h-4 w-4" />
-                                                )}
-                                            </button>
-                                        </div>
-                                    </div>
-                                    {verifyError && (
-                                        <p className="text-sm text-destructive">
-                                            {verifyError}
-                                        </p>
-                                    )}
-                                    <Button
-                                        onClick={handleVerifyPassword}
-                                        disabled={
-                                            isVerifying || !masterPassword
-                                        }
-                                        className="w-fit"
-                                    >
-                                        {isVerifying
-                                            ? "Verifying..."
-                                            : "Continue"}
-                                    </Button>
-                                </div>
-                            </div>
-                        ) : (
-                            /* Verified - Show Security Options */
-                            <div className="space-y-2">
-                                {/* Change Password Section */}
-                                <div className="space-y-3 p-4 bg-muted/50 rounded-md">
-                                    <div className="flex items-center gap-2 text-muted-foreground">
-                                        <Lock className="h-4 w-4" />
-                                        <h4 className="text-sm font-medium ">
-                                            Change Password
-                                        </h4>
-                                    </div>
-                                    <div className="flex flex-col gap-3 justify-end items-end">
-                                        <div className="grid gap-2 w-full">
-                                            <Label htmlFor="newPassword">
-                                                New Password
+                            {!isVerified ? (
+                                /* Master Password Verification */
+                                <div className="space-y-3 ">
+                                    <div className="grid gap-3">
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="masterPassword">
+                                                Current Password
                                             </Label>
+                                            <p className="text-sm text-muted-foreground">
+                                                Enter your current password to
+                                                change it and view quick switch
+                                                settings
+                                            </p>
                                             <div className="relative">
                                                 <Input
-                                                    id="newPassword"
+                                                    id="masterPassword"
                                                     type={
-                                                        showNewPassword
+                                                        showMasterPassword
                                                             ? "text"
                                                             : "password"
                                                     }
-                                                    value={newPassword}
+                                                    value={masterPassword}
                                                     onChange={(e) =>
-                                                        setNewPassword(
+                                                        setMasterPassword(
                                                             e.target.value
                                                         )
                                                     }
-                                                    placeholder="Enter new password"
+                                                    placeholder="Enter your password"
                                                     className="pr-10 shadow-none"
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === "Enter") {
+                                                            handleVerifyPassword();
+                                                        }
+                                                    }}
                                                 />
                                                 <button
                                                     type="button"
                                                     onClick={() =>
-                                                        setShowNewPassword(
-                                                            !showNewPassword
+                                                        setShowMasterPassword(
+                                                            !showMasterPassword
                                                         )
                                                     }
                                                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                                                 >
-                                                    {showNewPassword ? (
+                                                    {showMasterPassword ? (
                                                         <EyeOff className="h-4 w-4" />
                                                     ) : (
                                                         <Eye className="h-4 w-4" />
@@ -464,146 +398,218 @@ export function AccountSettingsDialog({
                                                 </button>
                                             </div>
                                         </div>
-                                        {passwordError && (
+                                        {verifyError && (
                                             <p className="text-sm text-destructive">
-                                                {passwordError}
-                                            </p>
-                                        )}
-                                        {passwordSuccess && (
-                                            <p className="text-sm text-green-600">
-                                                Password changed successfully!
+                                                {verifyError}
                                             </p>
                                         )}
                                         <Button
-                                            onClick={handlePasswordChange}
+                                            onClick={handleVerifyPassword}
                                             disabled={
-                                                isChangingPassword ||
-                                                !newPassword
+                                                isVerifying || !masterPassword
                                             }
-                                            className="w-fit shadow-none"
+                                            className="w-fit"
                                         >
-                                            {isChangingPassword
-                                                ? "Updating..."
-                                                : "Update Password"}
+                                            {isVerifying
+                                                ? "Verifying..."
+                                                : "Continue"}
                                         </Button>
                                     </div>
                                 </div>
-
-                                {/* Quick Switch Section */}
-                                <div className="space-y-3 p-4 bg-muted/50 rounded-md">
-                                    <div className="flex items-center justify-between">
-                                        <div className="space-y-3">
-                                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                                <KeyRound className="h-4 w-4" />
-                                                <h4 className="text-sm font-medium">
-                                                    Quick Switch
-                                                </h4>
-                                            </div>
-                                            <p className="text-xs text-muted-foreground">
-                                                Use a 4-6 digit PIN to quickly
-                                                switch back to your account
-                                            </p>
+                            ) : (
+                                /* Verified - Show Security Options */
+                                <div className="space-y-2">
+                                    {/* Change Password Section */}
+                                    <div className="space-y-3 p-4 bg-muted/50 rounded-md">
+                                        <div className="flex items-center gap-2 text-muted-foreground">
+                                            <Lock className="h-4 w-4" />
+                                            <h4 className="text-sm font-medium ">
+                                                Change Password
+                                            </h4>
                                         </div>
-                                        <Switch
-                                            checked={quickSwitchEnabled}
-                                            onCheckedChange={
-                                                handleQuickSwitchToggle
-                                            }
-                                            disabled={
-                                                isLoadingPinStatus ||
-                                                isSavingPin
-                                            }
-                                        />
+                                        <div className="flex flex-col gap-3 justify-end items-end">
+                                            <div className="grid gap-2 w-full">
+                                                <Label htmlFor="newPassword">
+                                                    New Password
+                                                </Label>
+                                                <div className="relative">
+                                                    <Input
+                                                        id="newPassword"
+                                                        type={
+                                                            showNewPassword
+                                                                ? "text"
+                                                                : "password"
+                                                        }
+                                                        value={newPassword}
+                                                        onChange={(e) =>
+                                                            setNewPassword(
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        placeholder="Enter new password"
+                                                        className="pr-10 shadow-none"
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            setShowNewPassword(
+                                                                !showNewPassword
+                                                            )
+                                                        }
+                                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                                    >
+                                                        {showNewPassword ? (
+                                                            <EyeOff className="h-4 w-4" />
+                                                        ) : (
+                                                            <Eye className="h-4 w-4" />
+                                                        )}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            {passwordError && (
+                                                <p className="text-sm text-destructive">
+                                                    {passwordError}
+                                                </p>
+                                            )}
+                                            {passwordSuccess && (
+                                                <p className="text-sm text-green-600">
+                                                    Password changed
+                                                    successfully!
+                                                </p>
+                                            )}
+                                            <Button
+                                                onClick={handlePasswordChange}
+                                                disabled={
+                                                    isChangingPassword ||
+                                                    !newPassword
+                                                }
+                                                className="w-fit shadow-none"
+                                            >
+                                                {isChangingPassword
+                                                    ? "Updating..."
+                                                    : "Update Password"}
+                                            </Button>
+                                        </div>
                                     </div>
 
-                                    {/* PIN Setup/Update Form - shown when enabled */}
-                                    {quickSwitchEnabled && (
-                                        <div className="space-y-3 pt-3 border-t">
-                                            <p className="text-sm text-muted-foreground">
-                                                {quickSwitchEnabled
-                                                    ? "Update your PIN"
-                                                    : "Create a 4-6 digit PIN"}
-                                            </p>
-                                            <div className="flex flex-col gap-3 items-end">
-                                                <div className="grid gap-2 w-full">
-                                                    <Label htmlFor="pin">
-                                                        New PIN
-                                                    </Label>
-                                                    <Input
-                                                        id="pin"
-                                                        type="password"
-                                                        inputMode="numeric"
-                                                        pattern="[0-9]*"
-                                                        maxLength={6}
-                                                        value={pin}
-                                                        onChange={(e) => {
-                                                            const value =
-                                                                e.target.value.replace(
-                                                                    /\D/g,
-                                                                    ""
-                                                                );
-                                                            setPin(value);
-                                                        }}
-                                                        placeholder="Enter 4-6 digit PIN"
-                                                        className="shadow-none w-full"
-                                                    />
+                                    {/* Quick Switch Section */}
+                                    <div className="space-y-3 p-4 bg-muted/50 rounded-md">
+                                        <div className="flex items-center justify-between">
+                                            <div className="space-y-3">
+                                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                    <KeyRound className="h-4 w-4" />
+                                                    <h4 className="text-sm font-medium">
+                                                        Quick Switch
+                                                    </h4>
                                                 </div>
-                                                <div className="grid gap-2 w-full">
-                                                    <Label htmlFor="confirmPin">
-                                                        Confirm PIN
-                                                    </Label>
-                                                    <Input
-                                                        id="confirmPin"
-                                                        type="password"
-                                                        inputMode="numeric"
-                                                        pattern="[0-9]*"
-                                                        maxLength={6}
-                                                        value={confirmPin}
-                                                        onChange={(e) => {
-                                                            const value =
-                                                                e.target.value.replace(
-                                                                    /\D/g,
-                                                                    ""
-                                                                );
-                                                            setConfirmPin(
-                                                                value
-                                                            );
-                                                        }}
-                                                        placeholder="Confirm your PIN"
-                                                        className="shadow-none w-full"
-                                                    />
-                                                </div>
-                                                {pinError && (
-                                                    <p className="text-sm text-destructive">
-                                                        {pinError}
-                                                    </p>
-                                                )}
-                                                {pinSuccess && (
-                                                    <p className="text-sm text-green-600">
-                                                        PIN saved successfully!
-                                                    </p>
-                                                )}
-                                                <Button
-                                                    onClick={handleSavePin}
-                                                    disabled={
-                                                        isSavingPin ||
-                                                        !pin ||
-                                                        !confirmPin
-                                                    }
-                                                    className="shadow-none"
-                                                >
-                                                    {isSavingPin
-                                                        ? "Saving..."
-                                                        : "Save PIN"}
-                                                </Button>
+                                                <p className="text-xs text-muted-foreground">
+                                                    Use a 4-6 digit PIN to
+                                                    quickly switch back to your
+                                                    account
+                                                </p>
                                             </div>
+                                            <Switch
+                                                checked={quickSwitchEnabled}
+                                                onCheckedChange={
+                                                    handleQuickSwitchToggle
+                                                }
+                                                disabled={
+                                                    isLoadingPinStatus ||
+                                                    isSavingPin
+                                                }
+                                            />
                                         </div>
-                                    )}
+
+                                        {/* PIN Setup/Update Form - shown when enabled */}
+                                        {quickSwitchEnabled && (
+                                            <div className="space-y-3 pt-3 border-t">
+                                                <p className="text-sm text-muted-foreground">
+                                                    {quickSwitchEnabled
+                                                        ? "Update your PIN"
+                                                        : "Create a 4-6 digit PIN"}
+                                                </p>
+                                                <div className="flex flex-col gap-3 items-end">
+                                                    <div className="grid gap-2 w-full">
+                                                        <Label htmlFor="pin">
+                                                            New PIN
+                                                        </Label>
+                                                        <Input
+                                                            id="pin"
+                                                            type="password"
+                                                            inputMode="numeric"
+                                                            pattern="[0-9]*"
+                                                            maxLength={6}
+                                                            value={pin}
+                                                            onChange={(e) => {
+                                                                const value =
+                                                                    e.target.value.replace(
+                                                                        /\D/g,
+                                                                        ""
+                                                                    );
+                                                                setPin(value);
+                                                            }}
+                                                            placeholder="Enter 4-6 digit PIN"
+                                                            className="shadow-none w-full"
+                                                        />
+                                                    </div>
+                                                    <div className="grid gap-2 w-full">
+                                                        <Label htmlFor="confirmPin">
+                                                            Confirm PIN
+                                                        </Label>
+                                                        <Input
+                                                            id="confirmPin"
+                                                            type="password"
+                                                            inputMode="numeric"
+                                                            pattern="[0-9]*"
+                                                            maxLength={6}
+                                                            value={confirmPin}
+                                                            onChange={(e) => {
+                                                                const value =
+                                                                    e.target.value.replace(
+                                                                        /\D/g,
+                                                                        ""
+                                                                    );
+                                                                setConfirmPin(
+                                                                    value
+                                                                );
+                                                            }}
+                                                            placeholder="Confirm your PIN"
+                                                            className="shadow-none w-full"
+                                                        />
+                                                    </div>
+                                                    {pinError && (
+                                                        <p className="text-sm text-destructive">
+                                                            {pinError}
+                                                        </p>
+                                                    )}
+                                                    {pinSuccess && (
+                                                        <p className="text-sm text-green-600">
+                                                            PIN saved
+                                                            successfully!
+                                                        </p>
+                                                    )}
+                                                    <Button
+                                                        onClick={handleSavePin}
+                                                        disabled={
+                                                            isSavingPin ||
+                                                            !pin ||
+                                                            !confirmPin
+                                                        }
+                                                        className="shadow-none"
+                                                    >
+                                                        {isSavingPin
+                                                            ? "Saving..."
+                                                            : "Save PIN"}
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
-                </div>
+                </ScrollArea>
             </DialogContent>
         </Dialog>
     );

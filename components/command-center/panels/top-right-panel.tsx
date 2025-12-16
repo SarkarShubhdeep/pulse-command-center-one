@@ -30,6 +30,7 @@ import {
     UserPlus,
     DoorOpen,
     ChevronsUpDown,
+    ChevronDown,
 } from "lucide-react";
 import { AccountSettingsDialog } from "./account-settings-dialog";
 import { useAuthUser } from "@/hooks/use-auth-user";
@@ -48,6 +49,7 @@ export function TopRightPanel() {
     const [expandedUserId, setExpandedUserId] = useState<string | null>(null);
     const [switchPin, setSwitchPin] = useState("");
     const [switchError, setSwitchError] = useState("");
+    const [dutiesOpen, setDutiesOpen] = useState(true);
     const { user } = useAuthUser();
     const router = useRouter();
     const { theme, setTheme } = useTheme();
@@ -467,24 +469,38 @@ export function TopRightPanel() {
 
                             {/* General Duties */}
                             {shift.duties.length > 0 && (
-                                <div className="space-y-2">
-                                    <h4 className="text-sm font-medium text-muted-foreground">
-                                        General Duties
-                                    </h4>
-                                    <ul className="space-y-1.5">
-                                        {shift.duties.map((duty) => (
-                                            <li
-                                                key={duty.id}
-                                                className="flex items-start gap-2 text-sm"
-                                            >
-                                                <span className="text-muted-foreground">
-                                                    •
-                                                </span>
-                                                <span>{duty.duty}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
+                                <Collapsible
+                                    open={dutiesOpen}
+                                    onOpenChange={setDutiesOpen}
+                                >
+                                    <CollapsibleTrigger asChild>
+                                        <button className="flex items-center justify-between w-full text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                                            <span>General Duties</span>
+                                            <ChevronDown
+                                                className={`h-4 w-4 transition-transform ${
+                                                    dutiesOpen
+                                                        ? "transform rotate-180"
+                                                        : ""
+                                                }`}
+                                            />
+                                        </button>
+                                    </CollapsibleTrigger>
+                                    <CollapsibleContent className="pt-2">
+                                        <ul className="space-y-1.5">
+                                            {shift.duties.map((duty) => (
+                                                <li
+                                                    key={duty.id}
+                                                    className="flex items-start gap-2 text-sm"
+                                                >
+                                                    <span className="text-muted-foreground">
+                                                        •
+                                                    </span>
+                                                    <span>{duty.duty}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </CollapsibleContent>
+                                </Collapsible>
                             )}
                         </div>
                     )}
