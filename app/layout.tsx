@@ -9,8 +9,8 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
     metadataBase: new URL(defaultUrl),
-    title: "Pulse Command Center",
-    description: "Desktop view for Pulse Application",
+    title: "Synapse Command Center",
+    description: "Desktop view for Synapse Application",
 };
 
 const geistSans = Geist({
