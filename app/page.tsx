@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthUser } from "@/hooks/use-auth-user";
 import Link from "next/link";
@@ -30,7 +30,7 @@ interface StaffMember {
     isReal?: boolean;
 }
 
-export default function Home() {
+function HomeContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const isAddingAccount = searchParams.get("add_account") === "true";
@@ -268,5 +268,24 @@ export default function Home() {
                 </div>
             </div>
         </div>
+    );
+}
+
+function LoadingFallback() {
+    return (
+        <div className="flex items-center justify-center min-h-screen">
+            <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                <p className="text-muted-foreground">Loading...</p>
+            </div>
+        </div>
+    );
+}
+
+export default function Home() {
+    return (
+        <Suspense fallback={<LoadingFallback />}>
+            <HomeContent />
+        </Suspense>
     );
 }
